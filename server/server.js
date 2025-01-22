@@ -18,11 +18,14 @@ mongoose.connect(process.env.MONGODB_URI).then(() => {
 
 const server = new ApolloServer({ typeDefs, resolvers });
 
-async ()=>{
+const startServer = async () => {
     await server.start();
     server.applyMiddleware({ app });
+    
+    const PORT = process.env.PORT || 4000;
+    app.listen(PORT, () => {
+        console.log(`Server ready at http://localhost:${PORT}${server.graphqlPath}`);
+    });
 };
 
-app.listen(3001, () => {   
-    console.log('Server is running on port 3001');  
-});
+startServer();
