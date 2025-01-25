@@ -9,8 +9,10 @@ const resolvers = {
     },
     Mutation :{
         createPost: async (_, args) => {
-            const {title, content} = args;
-            const post = new Post({title, content});
+            const id = args.postInput.id;
+            const title = args.postInput.title;
+            const content = args.postInput.content;
+            const post = new Post({id,title, content});
             await post.save();
             return post;
         }
