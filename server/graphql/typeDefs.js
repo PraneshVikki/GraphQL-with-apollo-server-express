@@ -9,37 +9,45 @@ type Post {
 },
 type Query {
     getPosts: [Post]
+    getAnimals: [Animal]
+    getDogs: [Dog]
+    getCats: [Cat]
 },
 input postInput {
     id: ID,
     title: String!,
     content: String,
 },
+input animalInput {
+    id: ID,
+    name: String!,
+    breed: String,  
+    color: String,
+},
+
 type Mutation {
-    createPost(postInput:postInput!): Post
+    createPost(postInput:postInput!): Post,
+    createAnimal(animalInput:animalInput!): Animal,
 }
 type Subscription {
     newPost: Post
 }
 
 interface Animal {
-  id: ID!
+  id: ID
   name: String!
-  species: String!
 }
 
 type Dog implements Animal {
-  id: ID!
+  id: ID
   name: String!
-  species: String!
-  breed: String!
+  breed: String
 }
 
 type Cat implements Animal {
-  id: ID!
+  id: ID
   name: String!
-  species: String!
-  color: String!
+  color: String
 }
 
 `;
