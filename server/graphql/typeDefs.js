@@ -12,6 +12,7 @@ type Query {
     getAnimals: [Animal]
     getDogs: [Dog]
     getCats: [Cat]
+    
 },
 input postInput {
     id: ID,
@@ -28,6 +29,8 @@ input animalInput {
 type Mutation {
     createPost(postInput:postInput!): Post,
     createAnimal(animalInput:animalInput!): Animal,
+    getError: Error
+    
 }
 type Subscription {
     newPost: Post
@@ -48,6 +51,17 @@ type Cat implements Animal {
   id: ID
   name: String!
   color: String
+}
+
+union Error = ValidationError | TimeoutError
+
+type ValidationError{
+  field: String
+  message: String
+}
+type TimeoutError{
+  message: String
+  timeLimit: Int
 }
 
 `;

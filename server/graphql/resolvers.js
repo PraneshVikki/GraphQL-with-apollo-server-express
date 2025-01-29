@@ -6,6 +6,7 @@ const Animal = require('./modules/Animal');
 dotenv.config();
 
 //const pubsub = new PubSub();
+let showValidationError = true;
 const resolvers = {
     Animal:{
         __resolveType(animal,context,info){
@@ -37,7 +38,8 @@ const resolvers = {
         getCats: async () => {
             const ani =  await Animal.find({});
             return ani.filter(animal => !!animal.color);
-        },
+        },        
+        
     },
     Mutation :{
         createPost: async (_, args,{pubsub}) => {
@@ -67,6 +69,29 @@ const resolvers = {
             await animal.save();
             console.log(animal);
             return animal;
+        },
+        getError: async (_, args) => {
+            let error = {};
+            if(showValidationError){
+                error = {field: 'name', message: 'Name is required'};
+            }
+            else{
+                error = {message: 'Timeout error' , timeLimit: 1000};
+            }
+            showValidationError = !showValidationError;
+            console.log(error);
+            return error;
+        }
+    },
+    Error:{
+        __resolveType(parent){
+            if(parent.field){
+                return "ValidationError";
+            }
+            if(parent.timeLimit){
+                return "TimeoutError";
+            }
+            return null;
         }
     },
     Subscription:{
