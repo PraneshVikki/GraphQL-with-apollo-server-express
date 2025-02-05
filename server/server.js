@@ -2,11 +2,12 @@ const express = require('express');
 const app = express();
 const { ApolloServer } = require('apollo-server-express');
 const cors = require('cors');
-app.use(cors(
-    {
-        origin: ['https://studio.apollographql.com','ws://localhost:4000/graphql','http://localhost:4000/graphql'],
-    }
-));    
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+app.use(cors({
+    origin: ['https://studio.apollographql.com', 'http://localhost:4000'],
+    credentials: true
+}));    
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 dotenv.config();
@@ -21,7 +22,7 @@ mongoose.connect(process.env.MONGODB_URI).then(() => {
     console.log(err); 
 });
 
-const server = new ApolloServer({ typeDefs, resolvers, context: ({ req,res }) => ({ req,res,pubsub }) });
+const server = new ApolloServer({ typeDefs, resolvers, context: ({ req,res }) => ({ req,res,pubsub }),cors: false});
 
 const startServer = async () => {
     await server.start();

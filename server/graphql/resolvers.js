@@ -3,7 +3,13 @@ const Post = require('./modules/posts');
 const { subscribe } = require('graphql');
 const dotenv = require('dotenv');   
 const Animal = require('./modules/Animal');
+const User = require('./modules/User');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 dotenv.config();
+const genterateToken = require('../component/generateToken');
+const auth = require('../middleware/auth');
+const Author = require('./modules/Author');
 
 //const pubsub = new PubSub();
 let showValidationError = true;
@@ -11,11 +17,10 @@ const resolvers = {
     Animal:{
         __resolveType(animal,context,info){
             if(animal.breed){
-                console.log('Dog');
                 return "Dog";
             }
             if(animal.color){
-                console.log('Cat');
+                
                 return "Cat";
             }
             
@@ -38,26 +43,54 @@ const resolvers = {
         getCats: async () => {
             const ani =  await Animal.find({});
             return ani.filter(animal => !!animal.color);
-        },        
-        
+        },  
+        isUser: async (_, args,context) => {
+            const user = await auth(context.req, context.res);
+            console.log(user);
+            if(user){
+                return true;
+            }
+            return false;
+        },
+        getPostDetails: async (_, args) => {
+            const post = await Post.find({id: args.id});
+            return post[0];
+        }
+
     },
+    PostDetails:{
+        author: async (parent) => {
+            const author = await Author.find({});
+            returnAuthor = author.filter(author => author.id === parent.author_id);
+            return returnAuthor;
+        }
+    },
+
     Mutation :{
         createPost: async (_, args,{pubsub}) => {
             const argsPost = {
                 id: args.postInput.id,
                 title: args.postInput.title,
-                content: args.postInput.content
+                content: args.postInput.content,
+                author_id: args.postInput.author_id
             }
-            console.log(pubsub);
             
             const post = new Post(argsPost);
-            console.log(post);
             await post.save();
             pubsub.publish(process.env.NEW_POST, {newPost: argsPost});
             return post;
         },
+        createAuthor: async (_, args) => {
+            const argsAuthor = {
+                id: args.AuthorInput.id,
+                name: args.AuthorInput.name
+            }
+            const author = new Author(argsAuthor);
+            await author.save();
+            return author;
+        },
+
         createAnimal: async (_, args) => {
-            console.log(args.animalInput.name);
             const argsAnimal = {
                 id: args.animalInput.id,
                 name: args.animalInput.name,
@@ -81,7 +114,25 @@ const resolvers = {
             showValidationError = !showValidationError;
             console.log(error);
             return error;
-        }
+        },
+        signup:async (_, args,{ req , res}) => {
+                const bcryptPassword = await bcrypt.hash(args.SignupInput.password, 12);
+                const token = genterateToken(args.SignupInput.email, args.SignupInput.id, {req, res});
+                const storeSignup = new User({id: args.SignupInput.id, name: args.SignupInput.name, email: args.SignupInput.email, password: bcryptPassword,token: token});
+                storeSignup.save();
+
+                return storeSignup;
+            },
+        signIn:async (_, args) => {
+                const user = await User.findOne({email: args.SigninInput.email});
+                if(user){
+                    const isMatch = await bcrypt.compare(args.SigninInput.password, user.password);
+                    if(isMatch){
+                        args.SigninInput.token = user.token;
+                    }
+                }
+            }
+        
     },
     Error:{
         __resolveType(parent){
