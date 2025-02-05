@@ -9,11 +9,12 @@ type Post {
     author_id: ID!
 },
 type PostDetails{
-    id: ID!,
+    id: ID,
     title: String!,
     content: String,
     author: [Author]
 }
+
 type Query {
     getPosts: [Post]
     getAnimals: [Animal]
@@ -21,6 +22,7 @@ type Query {
     getCats: [Cat]
     isUser: isUser
     getPostDetails(id: ID!): PostDetails
+    getAllPostDetails:[PostDetails!]
 },
 
 type Author{

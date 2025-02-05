@@ -55,16 +55,21 @@ const resolvers = {
         getPostDetails: async (_, args) => {
             const post = await Post.find({id: args.id});
             return post[0];
+        },
+        getAllPostDetails: async()=>{
+            return Post.find({})
         }
 
     },
     PostDetails:{
-        author: async (parent) => {
-            const author = await Author.find({});
-            returnAuthor = author.filter(author => author.id === parent.author_id);
-            return returnAuthor;
+        author: async (parent,args,context) => {            
+            const a =  [await context.authorLoader.load(parent.id)];
+            return a;
         }
     },
+
+
+    
 
     Mutation :{
         createPost: async (_, args,{pubsub}) => {
