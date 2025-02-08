@@ -23,6 +23,7 @@ type Query {
     isUser: isUser
     getPostDetails(id: ID!): PostDetails
     getAllPostDetails:[PostDetails!]
+    getUsers:[User]
 },
 
 type Author{

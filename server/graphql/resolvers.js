@@ -11,6 +11,7 @@ const genterateToken = require('../component/generateToken');
 const auth = require('../middleware/auth');
 const Author = require('./modules/Author');
 
+
 //const pubsub = new PubSub();
 let showValidationError = true;
 const resolvers = {
@@ -58,6 +59,9 @@ const resolvers = {
         },
         getAllPostDetails: async()=>{
             return Post.find({})
+        },
+        getUsers: async()=>{
+            return User.find({})
         }
 
     },

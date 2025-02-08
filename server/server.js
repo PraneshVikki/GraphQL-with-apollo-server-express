@@ -5,7 +5,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 app.use(cors({
-    origin: ['https://studio.apollographql.com', 'http://localhost:4000'],
+    origin: ['https://studio.apollographql.com', 'http://localhost:4000','https://studio.apollographql.com/sandbox/explorer','http://localhost:3000'],
     credentials: true
 }));    
 const mongoose = require('mongoose');
